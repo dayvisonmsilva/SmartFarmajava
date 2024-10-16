@@ -32,6 +32,7 @@ public class TelaUsuario {
             System.out.println("6 - Adicionar ao carrinho");
             System.out.println("7 - Remover do carrinho");
             System.out.println("8 - Realizar compra");
+            System.out.println("9 - Realizar pagamento");
             System.out.println("10 - Sair");
             System.out.print("Opção: ");
 
@@ -70,6 +71,9 @@ public class TelaUsuario {
                     break;
                 case 8:
                     realizarCompra(scanner, usuario);
+                    break;
+                case 9:
+                    realizarPagamento(scanner, usuario);
                     break;
                 case 10:
                     System.out.println("Saindo...");
@@ -271,7 +275,7 @@ public class TelaUsuario {
         try {
             List<Compra> compras = CompraDAO.listarComprasPorUsuario(user.getId());
             if (compras.isEmpty()) {
-                System.out.println("Você ainda não tinha um carrinho, um novo será criado.");
+                // System.out.println("Você ainda não tinha um carrinho, um novo será criado.");
                 criarCarrinho(scanner, user); // Cria um novo carrinho
             }
 
@@ -372,10 +376,10 @@ public class TelaUsuario {
             } else {
                 double subTotal = 0;
                 for (ItemPedido item : itensP) {
-                    System.out.println(item.getProduto() + "\nQuantidade: " + item.getQuantidade());
+                    System.out.print(item.getProduto() + "Quantidade: " + item.getQuantidade() + "\n");
                     subTotal += item.getPrecoTotal(); // Calcula o subtotal
                 }
-                System.out.println("Total do carrinho: " + String.format("%.2f", subTotal));
+                System.out.println("\nTotal do carrinho: " + String.format("%.2f", subTotal));
             }
 
         } catch (SQLException e) {
@@ -404,4 +408,50 @@ public class TelaUsuario {
         CompraDAO.adicionarCompra(carrinho);
     }
 
+    private static void realizarPagamento(Scanner scanner, Usuario user) {
+        try {
+            // Busca a compra ativa (carrinho ou pendente)
+            Compra compra = CompraDAO.buscarCompraAtivaPorUsuario(user.getId());
+    
+            if (compra == null) {
+                System.out.println("Você não tem compras ativas para pagar.");
+                return;
+            }
+    
+            // Verifica se a compra está no status "pendente" (tem itens prontos para o pagamento)
+            if (!compra.getStatus().equals("pendente")) {
+                System.out.println("A compra ainda não está pronta para pagamento.");
+                return;
+            }
+    
+            // Confirmação de pagamento
+            System.out.println("Deseja efetuar o pagamento da compra? (Digite 'sim' para confirmar)");
+            String confirmacao = scanner.nextLine();
+    
+            if (confirmacao.equalsIgnoreCase("sim")) {
+                // Atualizar o status da compra para 'finalizada'
+                compra.setStatus("finalizada");
+                CompraDAO.atualizarCompra(compra);
+    
+                // Atualizar o status da entrega para 'concluida'
+                Entrega entrega = compra.getEntrega();
+                entrega.setStatus("concluida");
+                EntregaDAO.atualizarEntrega(entrega);
+    
+                // Atualizar o status do pagamento para 'concluido'
+                Pagamento pagamento = compra.getPagamento();
+                pagamento.setStatus("concluido");
+                PagamentoDAO.atualizarPagamento(pagamento);
+    
+                // Deletar todos os itens da compra
+                ItemPedidoDAO.deletarItemPedidoPorIDdaCompra(compra.getId());
+    
+                System.out.println("Pagamento realizado com sucesso! A compra foi finalizada.");
+            } else {
+                System.out.println("Pagamento cancelado.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Ocorreu um erro ao processar o pagamento: " + e.getMessage());
+        }
+    }
 }

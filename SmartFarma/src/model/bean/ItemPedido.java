@@ -75,6 +75,6 @@ public class ItemPedido {
             "Preco Total: " + String.format("%.2f", precoTotal) + "\n" +
             produto.toString() +
             (compra != null ? compra.toString() : "Nenhuma compra associada") + "\n" +
-            "-------------------------------\n";
+            "-------------------------------";
     }
 }

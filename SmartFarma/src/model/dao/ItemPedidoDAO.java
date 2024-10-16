@@ -127,6 +127,29 @@ public class ItemPedidoDAO {
             ConnectionFactory.closeConnection(connection, statement);
         }
     }
+
+
+    public static void deletarItemPedidoPorIDdaCompra(int id) throws SQLException {
+        String sql = "DELETE FROM ItemPedido WHERE compra_id = ?";
+
+        Connection connection = ConnectionFactory.getConnection();
+        PreparedStatement statement = null;
+        
+        try {
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("ItemPedido deletado com sucesso!");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Erro ao deletar ItemPedido: " + ex.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection(connection, statement);
+        }
+    }
     
      /**
      * Este método é usado para listar todos os itens de pedido associados a uma compra específica.
