@@ -66,11 +66,8 @@ public class ItemPedidoDAO {
                 int produto_id = resultSet.getInt("produto_id");
                 int compra_id = resultSet.getInt("compra_id");
 
-                ProdutoDAO produtoDAO = new ProdutoDAO();
-                Produto produto = produtoDAO.buscarProduto(produto_id);
-
-                CompraDAO compraDAO = new CompraDAO();
-                Compra compra = compraDAO.buscarCompra(compra_id);
+                Produto produto = ProdutoDAO.buscarProduto(produto_id);
+                Compra compra = CompraDAO.buscarCompra(compra_id);
 
                 itemPedido = new ItemPedido(id, quantidade, produto, compra);
             }

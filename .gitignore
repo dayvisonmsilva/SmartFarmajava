@@ -29,3 +29,6 @@ replay_pid*
 !/SGCO/lib/*
 !/SGCO/lib/CopyLibs/*
 /SGCO/dist/
+
+# ignore .vscode
+.vscode

@@ -56,9 +56,9 @@ public class Login {
         
         try {
             Usuario user = UsuarioDAO.autenticarUsuario(email, senha);
-            System.out.println("email e senha digitados " + email + senha);
+            // System.out.println("email e senha digitados " + email + senha);
             if (user != null) {
-                System.out.println("Login bem-sucedido!");
+                System.out.println("LOGIN BEM SUCEDIDO!");
                 return user;
             } else {
                 System.out.println("Email ou senha incorretos. Por favor, tente novamente.");

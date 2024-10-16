@@ -217,5 +217,43 @@ public class CompraDAO {
 
         return max_id;
     }
+
+    public static Compra buscarCompraAtivaPorUsuario(int idUsuario) throws SQLException {
+        Compra compra = null;
+    
+        String sql = "SELECT * FROM Compra WHERE usuario_id = ? AND (status = 'carrinho' OR status = 'pendente') LIMIT 1";
+    
+        Connection connection = ConnectionFactory.getConnection();
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+    
+        try {
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, idUsuario);
+            resultSet = statement.executeQuery();
+    
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                Date data = resultSet.getDate("data");
+                String status = resultSet.getString("status");
+                int idEntrega = resultSet.getInt("entrega_id");
+                int idPagamento = resultSet.getInt("pagamento_id");
+    
+                Entrega entrega = EntregaDAO.buscarEntrega(idEntrega);
+                Pagamento pagamento = PagamentoDAO.buscarPagamento(idPagamento);
+                Usuario usuario = UsuarioDAO.buscarUsuario(idUsuario);
+    
+                // Cria e retorna a única compra com status "carrinho" ou "pendente"
+                compra = new Compra(id, data, status, entrega, pagamento, usuario);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Erro ao buscar a compra ativa: " + ex.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection(connection, statement, resultSet);
+        }
+    
+        return compra;
+    }
+    
 }
 
